@@ -328,7 +328,7 @@ func main() {
 	if err != nil {
 		e.Logger.Fatalf("DB connection failed : %v", err)
 	}
-	chairDB.SetMaxOpenConns(10)
+	chairDB.SetMaxOpenConns(20)
 	defer chairDB.Close()
 
 	// estate DB
@@ -337,7 +337,7 @@ func main() {
 	if err != nil {
 		e.Logger.Fatalf("DB connection failed : %v", err)
 	}
-	estateDB.SetMaxOpenConns(10)
+	estateDB.SetMaxOpenConns(20)
 	defer estateDB.Close()
 
 	// Start server
