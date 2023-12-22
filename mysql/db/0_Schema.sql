@@ -40,7 +40,9 @@ CREATE TABLE isuumo.chair
 	stock       INTEGER         NOT NULL
 );
 
-CREATE INDEX price_id_idx on isuumo.chair(price, id);
-CREATE INDEX rent_id_idx on isuumo.estate(rent, id);
+CREATE INDEX chair_price_id_idx on isuumo.chair(price, id);
+CREATE INDEX estate_rent_id_idx on isuumo.estate(rent, id);
 CREATE INDEX estate_popularity_desc_id_idx on isuumo.estate(popularity_desc, id);
 CREATE INDEX chair_popularity_desc_id_idx on isuumo.chair(popularity_desc, id);
+CREATE INDEX estate_door_height_idx on isuumo.estate(door_height);
+CREATE INDEX estate_door_width_idx on isuumo.estate(door_width);
