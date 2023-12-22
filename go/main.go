@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -250,6 +251,42 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			userAgent := c.Request().UserAgent()
+
+			// 一致させたいユーザーエージェントのパターン
+			patterns := []string{
+				"ISUCONbot(-Mobile)?",
+				"ISUCONbot-Image\\/",
+				"Mediapartners-ISUCON",
+				"ISUCONCoffee",
+				"ISUCONFeedSeeker(Beta)?",
+				"crawler \\(https:\\/\\/isucon\\.invalid\\/(support\\/faq\\/|help\\/jp\\/)\\)",
+				"isubot",
+				"Isupider",
+				"Isupider(-image)?\\+",
+				"(bot|crawler|spider)(?:[-_ .\\/;@()]|$)",
+			}
+
+			// リクエストのユーザーエージェントをチェック
+			for _, pattern := range patterns {
+				matched, err := regexp.MatchString(pattern, userAgent)
+				if err != nil {
+					// 正規表現のエラー処理
+					c.Logger().Errorf("regex error: %v", err)
+					return echo.NewHTTPError(http.StatusInternalServerError, "Server Error")
+				}
+				if matched {
+					// パターンに一致したら、503エラーを返す
+					return echo.NewHTTPError(http.StatusServiceUnavailable, "Service Unavailable")
+				}
+			}
+
+			// 一致しなければ次のハンドラーへ
+			return next(c)
+		}
+	})
 
 	// Initialize
 	e.POST("/initialize", initialize)
